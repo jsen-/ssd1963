@@ -1,0 +1,36 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "cargo test build",
+			"command": "cargo",
+			"args": [
+				"test",
+				"--no-run",
+				"--target=x86_64-unknown-linux-gnu"
+			],
+			"problemMatcher": [
+				"$rustc"
+			]
+		},
+		{
+			"type": "cargo",
+			"command": "test",
+			"args": [
+				"--target=x86_64-unknown-linux-gnu"
+			],
+			"problemMatcher": [
+				"$rustc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"clear": true
+			},
+			"label": "rust: cargo test"
+		}
+	]
+}
