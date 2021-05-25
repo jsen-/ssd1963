@@ -18,7 +18,8 @@
 			"type": "cargo",
 			"command": "test",
 			"args": [
-				"--target=x86_64-unknown-linux-gnu"
+				"--target=x86_64-unknown-linux-gnu",
+				"--all-features"
 			],
 			"problemMatcher": [
 				"$rustc"

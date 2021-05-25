@@ -1,7 +1,6 @@
-use super::{ControlledBy, DataFormat, DisplayError, WriteCommand, WriteOnlyDataCommand};
+use super::{ControlledBy};
 use packed_struct::{
     derive::{PackedStruct, PrimitiveEnum_u8},
-    PackedStruct,
 };
 
 #[derive(PrimitiveEnum_u8, Clone, Copy, Debug, PartialEq)]
@@ -50,19 +49,10 @@ pub struct SetPwmConf {
     pub brightness_prescaler: BrightnessPrescaler,
 }
 
-impl WriteCommand for SetPwmConf {
-    fn send<I>(&self, mut ifc: I) -> Result<(), DisplayError>
-    where
-        I: WriteOnlyDataCommand,
-    {
-        ifc.send_commands(DataFormat::U8(&[0xBE]))?;
-        ifc.send_data(DataFormat::U8(&self.pack().unwrap()))
-    }
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
+    use packed_struct::PackedStruct;
 
     #[test]
     fn set_post_proc() {

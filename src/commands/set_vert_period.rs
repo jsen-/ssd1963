@@ -1,11 +1,9 @@
-use super::{DataFormat, DisplayError, WriteCommand, WriteOnlyDataCommand};
 use packed_struct::{
     derive::PackedStruct,
     types::{
         bits::{Bits11, Bits7},
         Integer,
     },
-    PackedStruct,
 };
 
 #[derive(PackedStruct, Debug, PartialEq)]
@@ -21,19 +19,10 @@ pub struct SetVertPeriod {
     pub fps: Integer<u16, Bits11>,
 }
 
-impl WriteCommand for SetVertPeriod {
-    fn send<I>(&self, mut ifc: I) -> Result<(), DisplayError>
-    where
-        I: WriteOnlyDataCommand,
-    {
-        ifc.send_commands(DataFormat::U8(&[0xB6]))?;
-        ifc.send_data(DataFormat::U8(&self.pack().unwrap()))
-    }
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
+    use packed_struct::PackedStruct;
 
     #[test]
     fn set_vert_period() {

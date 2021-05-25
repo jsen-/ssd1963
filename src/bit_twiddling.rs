@@ -9,8 +9,8 @@ macro_rules! impl_bit_index {
             where
                 Self: BitIndex<N>,
             {
-                let bit = if val { 1 } else { 0 };
-                self & !(1 << N) | bit << N
+                let bit = if val { 1 << N } else { 0 };
+                self & !(1 << N) | bit
             }
         }
         $(impl_bit_index!($ty, $n);)+
@@ -33,8 +33,8 @@ impl SetBit for &mut u8 {
     where
         Self: BitIndex<N>,
     {
-        let bit = if val { 1 } else { 0 };
-        *self = *self & !(1 << N) | bit << N;
+        let bit = if val { 1 << N } else { 0 };
+        *self = *self & !(1 << N) | bit;
     }
 }
 

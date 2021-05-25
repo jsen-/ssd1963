@@ -1,8 +1,4 @@
-use super::{DataFormat, DisplayError, WriteCommand, WriteOnlyDataCommand};
-use packed_struct::{
-    derive::{PackedStruct, PrimitiveEnum_u8},
-    PackedStruct,
-};
+use packed_struct::derive::{PackedStruct, PrimitiveEnum_u8};
 
 #[derive(PrimitiveEnum_u8, Clone, Copy, Debug, PartialEq)]
 pub enum Output {
@@ -23,19 +19,10 @@ pub struct SetGpioValue {
     pub gpio0_value: Output,
 }
 
-impl WriteCommand for SetGpioValue {
-    fn send<I>(&self, mut ifc: I) -> Result<(), DisplayError>
-    where
-        I: WriteOnlyDataCommand,
-    {
-        ifc.send_commands(DataFormat::U8(&[0xBA]))?;
-        ifc.send_data(DataFormat::U8(&self.pack().unwrap()))
-    }
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
+    use packed_struct::PackedStruct;
 
     #[test]
     fn set_gpio_conf() {

@@ -1,8 +1,6 @@
-use super::{DataFormat, DisplayError, WriteCommand, WriteOnlyDataCommand};
 use packed_struct::{
     derive::{PackedStruct, PrimitiveEnum_u8},
     types::{bits::Bits11, Integer},
-    PackedStruct,
 };
 
 #[derive(PrimitiveEnum_u8, Clone, Copy, Debug, PartialEq)]
@@ -67,19 +65,10 @@ pub struct SetLcdMode {
     pub odd_line_color_sequence: ColorSequence,
 }
 
-impl WriteCommand for SetLcdMode {
-    fn send<I>(&self, mut ifc: I) -> Result<(), DisplayError>
-    where
-        I: WriteOnlyDataCommand,
-    {
-        ifc.send_commands(DataFormat::U8(&[0xB0]))?;
-        ifc.send_data(DataFormat::U8(&self.pack().unwrap()))
-    }
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
+    use packed_struct::PackedStruct;
 
     #[test]
     fn set_lcd_mode() {
