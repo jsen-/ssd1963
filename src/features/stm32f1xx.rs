@@ -32,6 +32,7 @@ impl PortA {
     ) -> Self {
         Self
     }
+
     #[allow(unused_variables)]
     // TODO: find a better name
     pub fn new2(
@@ -70,7 +71,6 @@ impl WritePort for PortA {
     fn set_value(&mut self, value: u16) {
         unsafe { (&*stm32f1xx_hal::pac::GPIOA::ptr()).odr.write(|w| w.bits(value as u32)) };
     }
-    fn dir_write(&mut self) {}
 }
 
 pub struct RwPortA(ACRL, ACRH);
@@ -107,12 +107,11 @@ impl WritePort for RwPortA {
     fn set_value(&mut self, value: u16) {
         unsafe { (&*stm32f1xx_hal::pac::GPIOA::ptr()).odr.write(|w| w.bits(value.into())) };
     }
-    fn dir_write(&mut self) {}
 }
 impl ReadWritePort for RwPortA {
     fn get_value(&mut self) -> u16 {
         // TODO: try to find alternative without "as"
-        unsafe { (&*stm32f1xx_hal::pac::GPIOA::ptr()).odr.read().bits() as u16 }
+        unsafe { (&*stm32f1xx_hal::pac::GPIOA::ptr()).idr.read().bits() as u16 }
     }
     fn dir_read(&mut self) {
         unsafe {
@@ -191,7 +190,6 @@ impl WritePort for PortB {
     fn set_value(&mut self, value: u16) {
         unsafe { (&*stm32f1xx_hal::pac::GPIOB::ptr()).odr.write(|w| w.bits(value as u32)) };
     }
-    fn dir_write(&mut self) {}
 }
 
 pub struct RwPortB(BCRL, BCRH);
@@ -228,12 +226,11 @@ impl WritePort for RwPortB {
     fn set_value(&mut self, value: u16) {
         unsafe { (&*stm32f1xx_hal::pac::GPIOB::ptr()).odr.write(|w| w.bits(value.into())) };
     }
-    fn dir_write(&mut self) {}
 }
 impl ReadWritePort for RwPortB {
     fn get_value(&mut self) -> u16 {
         // TODO: try to find alternative without "as"
-        unsafe { (&*stm32f1xx_hal::pac::GPIOB::ptr()).odr.read().bits() as u16 }
+        unsafe { (&*stm32f1xx_hal::pac::GPIOB::ptr()).idr.read().bits() as u16 }
     }
     fn dir_read(&mut self) {
         unsafe {
@@ -310,7 +307,6 @@ impl WritePort for PortC {
     fn set_value(&mut self, value: u16) {
         unsafe { (&*stm32f1xx_hal::pac::GPIOC::ptr()).odr.write(|w| w.bits(value as u32)) };
     }
-    fn dir_write(&mut self) {}
 }
 
 pub struct RwPortC(CCRL, CCRH);
@@ -347,11 +343,10 @@ impl WritePort for RwPortC {
     fn set_value(&mut self, value: u16) {
         unsafe { (&*stm32f1xx_hal::pac::GPIOC::ptr()).odr.write(|w| w.bits(value.into())) };
     }
-    fn dir_write(&mut self) {}
 }
 impl ReadWritePort for RwPortC {
     fn get_value(&mut self) -> u16 {
-        unsafe { (&*stm32f1xx_hal::pac::GPIOC::ptr()).odr.read().bits() as u16 }
+        unsafe { (&*stm32f1xx_hal::pac::GPIOC::ptr()).idr.read().bits() as u16 }
     }
     fn dir_read(&mut self) {
         unsafe {

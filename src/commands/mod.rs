@@ -45,6 +45,8 @@ impl_command!(set_pwm_conf::SetPwmConf, 0xBE);
 impl_command!(set_dbc_conf::SetDbcConf, 0xD0);
 impl_command!(set_column_address::SetColumnAddress, 0x2A);
 impl_command!(set_page_address::SetPageAddress, 0x2B);
+impl_command!(set_scroll_area::SetScrollArea, 0x33);
+impl_command!(set_scroll_start::SetScrollStart, 0x37);
 
 use packed_struct::derive::PrimitiveEnum_u8;
 #[derive(PrimitiveEnum_u8, Clone, Copy, Debug, PartialEq)]

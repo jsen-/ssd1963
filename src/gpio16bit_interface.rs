@@ -1,6 +1,5 @@
 pub trait WritePort {
     fn set_value(&mut self, value: u16);
-    fn dir_write(&mut self);
 }
 
 pub trait ReadWritePort: WritePort {
@@ -99,6 +98,7 @@ where
     pub fn get_value(&mut self) -> Result<u16, Error> {
         let value = self.port.get_value();
         self.rd.set_high()?;
+        self.rd.set_low()?;
         Ok(value)
     }
 }
@@ -127,8 +127,28 @@ where
             rd: self.rd,
         })
     }
+    pub fn into_command<'b>(self) -> Result<ValueGetter<'b, PortX, RD, Error>, Error>
+    where
+        'a: 'b,
+    {
+        self.dc.set_low()?;
+        Ok(ValueGetter {
+            port: self.port,
+            rd: self.rd,
+        })
+    }
 
     pub fn data(&mut self) -> Result<ValueGetter<PortX, RD, Error>, Error> {
+        self.dc.set_high()?;
+        Ok(ValueGetter {
+            port: self.port,
+            rd: self.rd,
+        })
+    }
+    pub fn into_data<'b>(self) -> Result<ValueGetter<'b, PortX, RD, Error>, Error>
+    where
+        'a: 'b,
+    {
         self.dc.set_high()?;
         Ok(ValueGetter {
             port: self.port,
@@ -193,7 +213,9 @@ where
 }
 
 pub struct GpioReadWrite16BitInterface<Port, DC, WR, RD> {
-    inner: GpioWriteOnly16BitInterface<Port, DC, WR>,
+    port: Port,
+    dc: DC,
+    wr: WR,
     rd: RD,
 }
 
@@ -205,16 +227,13 @@ where
     RD: embedded_hal::digital::v2::OutputPin<Error = Error>,
 {
     pub fn new(port: PortX, dc: DC, wr: WR, rd: RD) -> Self {
-        Self {
-            inner: GpioWriteOnly16BitInterface::new(port, dc, wr),
-            rd,
-        }
+        Self { port, dc, wr, rd }
     }
 }
 
 impl<PortX, DC, WR, RD, Error> WriteOnlyInterface for GpioReadWrite16BitInterface<PortX, DC, WR, RD>
 where
-    PortX: WritePort,
+    PortX: ReadWritePort,
     DC: embedded_hal::digital::v2::OutputPin<Error = Error>,
     WR: embedded_hal::digital::v2::OutputPin<Error = Error>,
     RD: embedded_hal::digital::v2::OutputPin<Error = Error>,
@@ -224,9 +243,14 @@ where
     type DC = DC;
     type WR = WR;
     fn write(&mut self) -> Result<Writer<PortX, DC, WR, Error>, Error> {
+        self.wr.set_high()?;
         self.rd.set_high()?;
-        self.inner.port.dir_write();
-        self.inner.write()
+        self.port.dir_write();
+        Ok(Writer {
+            port: &mut self.port,
+            dc: &mut self.dc,
+            wr: &mut self.wr,
+        })
     }
 }
 
@@ -240,13 +264,13 @@ where
     type Port = PortX;
     type RD = RD;
     fn read(&mut self) -> Result<Reader<PortX, DC, RD, Error>, Error> {
-        self.inner.wr.set_high()?; // maybe not needed
+        self.port.dir_read();
+        self.wr.set_high()?; // maybe not needed
         self.rd.set_low()?; // read
-        self.inner.port.dir_read();
 
         Ok(Reader {
-            port: &mut self.inner.port,
-            dc: &mut self.inner.dc,
+            port: &mut self.port,
+            dc: &mut self.dc,
             rd: &mut self.rd,
         })
     }
